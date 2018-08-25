@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">VideoGame News</string>
+    <string name="short_name">VGN</string>
+    <string name="old_news">Articoli precedenti</string>
+    <string name="previous_last_not_found">Ultimo articolo precedente non trovato.</string>
+    <string name="no_news">Nessun articolo trovato</string>
+    <string name="bookmarks">Articoli salvati</string>
+    <string name="delete_all">Elimina tutti</string>
+    <string name="are_you_sure">Sei sicuro?</string>
+    <string name="delete">Elimina</string>
+    <string name="cancel">Annulla</string>
+    <string name="send_email">Invia email</string>
+    <string name="sending_email">Invio la mail...</string>
+    <string name="send_email_error">Errore durante l\'invio della mail</string>
+</resources>
