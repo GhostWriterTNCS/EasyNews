@@ -3,10 +3,10 @@ package com.davide.vgn;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 		sp = getSharedPreferences(MainActivity.TAG, MainActivity.MODE_PRIVATE);
 		context = getApplicationContext();
 
-		if(!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler)) {
+		if (!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler)) {
 			Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
 					Environment.getExternalStorageDirectory().getPath() + "/VGN_log"));
 		}
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private static TextView bookmarksCount;
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main_menu, menu);
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 		bookmarksCount = (TextView) menu_hotlist.findViewById(R.id.text);
 		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null)).size();
 		bookmarksCount.setText(Integer.toString(rssFeedsSize));
-		RelativeLayout rl = (RelativeLayout)menu.findItem(R.id.bookmarks).getActionView();
+		RelativeLayout rl = (RelativeLayout) menu.findItem(R.id.bookmarks).getActionView();
 		rl.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 		});
 		return super.onCreateOptionsMenu(menu);
 	}
+
 	public static void updateRssFeedsSize() {
 		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null)).size();
 		bookmarksCount.setText(Integer.toString(rssFeedsSize));

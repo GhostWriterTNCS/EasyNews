@@ -73,12 +73,12 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 
 		boolean previousFound = false;
 		List<String> lastNews = new ArrayList<String>();
-		for(int index=0; index<3; index++) {
+		for (int index = 0; index < 3; index++) {
 			lastNews.add(rssFeeds.get(index).title + "@" + rssFeeds.get(index).channelTitle);
 		}
 
-		for(int index=0; index<3; index++) {
-			if(previousFound) {
+		for (int index = 0; index < 3; index++) {
+			if (previousFound) {
 				break;
 			}
 			String prevLastNews = MainActivity.sp.getString("previous_" + index, null);
@@ -105,7 +105,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		}
 
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
-		for(int index=0; index<3; index++) {
+		for (int index = 0; index < 3; index++) {
 			editor.putString("previous_" + index, lastNews.get(index));
 		}
 		editor.apply();
@@ -135,6 +135,24 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				child.findViewById(R.id.subtitleText).setVisibility(View.GONE);
 				child.findViewById(R.id.descriptionText).setVisibility(View.GONE);
 			} else {
+				child.findViewById(R.id.verticalLayout).setOnLongClickListener(new View.OnLongClickListener() {
+					@Override
+					public boolean onLongClick(View view) {
+						ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+						if (!rssFeeds.contains(rssFeed)) {
+							rssFeeds.add(0, rssFeed);
+							Toast.makeText(MainActivity.context, "[+] " + rssFeed.title, Toast.LENGTH_SHORT).show();
+						/*} else {
+							rssFeeds.remove(rssFeed);
+							Toast.makeText(MainActivity.context, "[-] " + rssFeed.title, Toast.LENGTH_SHORT).show();*/
+						}
+						SharedPreferences.Editor editor = MainActivity.sp.edit();
+						editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
+						editor.apply();
+						MainActivity.updateRssFeedsSize();
+						return true;
+					}
+				});
 				child.findViewById(R.id.verticalLayout).setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {

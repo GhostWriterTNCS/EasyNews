@@ -52,9 +52,9 @@ public class ArticleViewActivity extends AppCompatActivity {
 						+ ": " + description + " (url: " + failingUrl + ")");
 			}
 		});
-		if (android.os.Build.VERSION.SDK_INT >= 21) {
+		//if (android.os.Build.VERSION.SDK_INT >= 21) {
 			mWebView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-		}
+		//}
 		setTitle(rssFeed.title);
 
 		mSwipeLayout.setRefreshing(true);
