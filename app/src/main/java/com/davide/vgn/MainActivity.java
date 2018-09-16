@@ -59,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
 				Log.v(TAG, "Read permission is granted.");
 				return true;
 			} else {
-
 				Log.v(TAG, "Read permission is revoked.");
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
 				return false;
 			}
-		} else { //permission is automatically granted on sdk<23 upon installation
+		} else {
+			// Permission is automatically granted on sdk<23 upon installation
 			Log.v(TAG, "Read permission is granted.");
 			return true;
 		}
@@ -82,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
 				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
 				return false;
 			}
-		} else { //permission is automatically granted on sdk<23 upon installation
+		} else {
+			// Permission is automatically granted on sdk<23 upon installation
 			Log.v(TAG, "Write permission is granted.");
 			return true;
 		}

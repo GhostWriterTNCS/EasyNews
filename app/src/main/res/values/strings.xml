@@ -7,6 +7,9 @@
     <string name="bookmarks">Articoli salvati</string>
     <string name="export_json">Esporta JSON</string>
     <string name="import_json">Importa JSON</string>
+    <string name="export_json_success">Articoli esportati correttamente.</string>
+    <string name="import_json_success">Articoli importati correttamente.</string>
+    <string name="an_error_occurred">Si è verificato un errore.</string>
     <string name="delete_all">Elimina tutti</string>
     <string name="are_you_sure">Sei sicuro?</string>
     <string name="delete">Elimina</string>

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -86,11 +87,15 @@ public class SavedArticlesActivity extends AppCompatActivity {
 				j.put("image", rf.image);
 				jsonObject.put(j);
 			}
-			CustomIO.WriteFile("VGN", filename, jsonObject.toString());
+			Log.d("JSON", jsonObject.toString());
+			if(CustomIO.WriteFile("VGN", filename, jsonObject.toString())) {
+				Toast.makeText(activity, MainActivity.context.getString(R.string.export_json_success), Toast.LENGTH_SHORT).show();
+				return;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Log.d("JSON", jsonObject.toString());
+		Toast.makeText(activity, MainActivity.context.getString(R.string.an_error_occurred), Toast.LENGTH_LONG).show();
 	}
 
 	public void ImportJSON() {
@@ -113,10 +118,12 @@ public class SavedArticlesActivity extends AppCompatActivity {
 			editor.apply();
 			MainActivity.updateRssFeedsSize();
 			new SavedFetchFeedTask(activity, mSwipeLayout).execute((Void) null);
+			Toast.makeText(activity, MainActivity.context.getString(R.string.import_json_success), Toast.LENGTH_SHORT).show();
 			Log.d("JSON", rssFeeds.size() + " bookmarks imported.");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.d("JSON", "Bookmarks not imported.");
+			Toast.makeText(activity, MainActivity.context.getString(R.string.an_error_occurred), Toast.LENGTH_LONG).show();
 		}
 	}
 
