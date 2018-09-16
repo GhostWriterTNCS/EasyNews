@@ -7,4 +7,10 @@
         android:icon="@drawable/ic_trash"
         app:showAsAction="always"
         android:title="@string/bookmarks" />
+    <item
+        android:id="@+id/export_json"
+        android:title="@string/export_json" />
+    <item
+        android:id="@+id/import_json"
+        android:title="@string/import_json" />
 </menu>

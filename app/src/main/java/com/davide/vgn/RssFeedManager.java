@@ -158,7 +158,7 @@ public final class RssFeedManager {
 		}
 	}
 
-	public static String SerializeList(ArrayList<RssFeed> rssFeeds) {
+	public static String SerializeList(List<RssFeed> rssFeeds) {
 		try {
 			ByteArrayOutputStream bo = new ByteArrayOutputStream();
 			ObjectOutputStream oo = new ObjectOutputStream(bo);

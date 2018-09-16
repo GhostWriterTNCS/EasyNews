@@ -6,8 +6,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SavedArticlesActivity extends AppCompatActivity {
 
@@ -50,11 +57,67 @@ public class SavedArticlesActivity extends AppCompatActivity {
 								editor.remove("saved_news");
 								editor.apply();
 								new SavedFetchFeedTask(activity, mSwipeLayout).execute((Void) null);
-							}})
+							}
+						})
 						.setNegativeButton(R.string.cancel, null).show();
+				return true;
+			case R.id.export_json:
+				ExportJSON();
+				return true;
+			case R.id.import_json:
+				ImportJSON();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	public static String filename = "bookmarks.json";
+	public void ExportJSON() {
+		List<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		JSONArray jsonObject = new JSONArray();
+		try {
+			for (RssFeed rf : rssFeeds) {
+				JSONObject j = new JSONObject();
+				j.put("channelTitle", rf.channelTitle);
+				j.put("title", rf.title);
+				j.put("link", rf.link);
+				j.put("description", rf.description);
+				j.put("pubDate", RssFeedManager.formatter.format(rf.pubDate));
+				j.put("image", rf.image);
+				jsonObject.put(j);
+			}
+			CustomIO.WriteFile("VGN", filename, jsonObject.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Log.d("JSON", jsonObject.toString());
+	}
+
+	public void ImportJSON() {
+		try {
+			JSONArray jsonObject = new JSONArray(CustomIO.ReadFile("VGN", filename));
+			List<RssFeed> rssFeeds = new ArrayList<RssFeed>();
+			for (int i = 0; i < jsonObject.length(); i++) {
+				JSONObject j = jsonObject.getJSONObject(i);
+				rssFeeds.add(new RssFeed(
+						j.getString("channelTitle"),
+						j.getString("title"),
+						j.getString("link"),
+						j.getString("description"),
+						RssFeedManager.formatter.parse(j.getString("pubDate")),
+						j.getString("image")
+				));
+			}
+			SharedPreferences.Editor editor = MainActivity.sp.edit();
+			editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
+			editor.apply();
+			MainActivity.updateRssFeedsSize();
+			new SavedFetchFeedTask(activity, mSwipeLayout).execute((Void) null);
+			Log.d("JSON", rssFeeds.size() + " bookmarks imported.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.d("JSON", "Bookmarks not imported.");
+		}
 	}
 
 	private class SavedFetchFeedTask extends FetchFeedTask {
