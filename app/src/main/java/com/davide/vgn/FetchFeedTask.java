@@ -71,13 +71,18 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			}
 		});
 
+		int previousLogLength = 10;
 		boolean previousFound = false;
 		List<String> lastNews = new ArrayList<String>();
-		for (int index = 0; index < 3; index++) {
+		for (int index = 0; index < previousLogLength; index++) {
+			if (rssFeeds.size() <= index) {
+				previousLogLength = index;
+				break;
+			}
 			lastNews.add(rssFeeds.get(index).title + "@" + rssFeeds.get(index).channelTitle);
 		}
 
-		for (int index = 0; index < 3; index++) {
+		for (int index = 0; index < previousLogLength; index++) {
 			if (previousFound) {
 				break;
 			}
@@ -105,7 +110,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		}
 
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
-		for (int index = 0; index < 3; index++) {
+		for (int index = 0; index < lastNews.size(); index++) {
 			editor.putString("previous_" + index, lastNews.get(index));
 		}
 		editor.apply();

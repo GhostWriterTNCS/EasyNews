@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+	xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/bookmark"
-        android:icon="@drawable/ic_bookmark_outline"
-        android:title="@string/bookmarks"
-        app:showAsAction="always" />
+	<item
+		android:id="@+id/bookmark"
+		android:icon="@drawable/ic_bookmark_outline"
+		android:title="@string/bookmarks"
+		app:showAsAction="always" />
 
-    <item
-        android:id="@+id/send_email"
-        android:icon="@drawable/ic_email"
-        android:title="@string/send_email"
-        app:showAsAction="always" />
+	<item
+		android:id="@+id/send_email"
+		android:icon="@drawable/ic_email"
+		android:title="@string/send_email"
+		app:showAsAction="always" />
+	<item
+		android:id="@+id/open_in_browser"
+		android:title="Open in browser" />
 </menu>

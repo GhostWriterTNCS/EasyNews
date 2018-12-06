@@ -2,6 +2,7 @@ package com.davide.vgn;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
@@ -53,7 +54,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 			}
 		});
 		//if (android.os.Build.VERSION.SDK_INT >= 21) {
-			mWebView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+		mWebView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 		//}
 		setTitle(rssFeed.title);
 
@@ -101,7 +102,11 @@ public class ArticleViewActivity extends AppCompatActivity {
 				return true;
 			case R.id.send_email:
 				Toast.makeText(ArticleViewActivity.this, MainActivity.context.getString(R.string.sending_email), Toast.LENGTH_SHORT).show();
-				new SendEmailAsyncTask(ArticleViewActivity.this,"From VGN: " + rssFeed.title, rssFeed.link).execute();
+				new SendEmailAsyncTask(ArticleViewActivity.this, "From VGN: " + rssFeed.title, rssFeed.link).execute();
+				return true;
+			case R.id.open_in_browser:
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssFeed.link));
+				startActivity(browserIntent);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
