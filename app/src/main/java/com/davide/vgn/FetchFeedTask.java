@@ -54,6 +54,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				}
 				URL url = new URL(urlLink);
 				InputStream inputStream = url.openConnection().getInputStream();
+				Log.d(MainActivity.TAG, urlLink);
 				rssFeeds.addAll(RssFeedManager.parseFeed(inputStream));
 				inputStream.close();
 			} catch (Exception e) {

@@ -19,7 +19,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import javax.mail.AuthenticationFailedException;
-import javax.mail.MessagingException;
 
 public class ArticleViewActivity extends AppCompatActivity {
 	private RssFeed rssFeed;
@@ -51,6 +50,20 @@ public class ArticleViewActivity extends AppCompatActivity {
 						Toast.LENGTH_LONG).show();
 				Log.e(MainActivity.TAG, "WebView error " + errorCode
 						+ ": " + description + " (url: " + failingUrl + ")");
+			}
+
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				if (url.startsWith("https://it.ign.com/") && !url.startsWith("https://it.ign.com/m/")) {
+					url = url.replace("https://it.ign.com/", "https://it.ign.com/m/");
+				}
+				if (view.getHitTestResult().getType() > 0) {
+					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+					startActivity(i);
+				} else {
+					view.loadUrl(url);
+				}
+				return true;
 			}
 		});
 		//if (android.os.Build.VERSION.SDK_INT >= 21) {
@@ -135,17 +148,20 @@ class SendEmailAsyncTask extends AsyncTask<Void, Void, Boolean> {
 					"")) { // recipients
 				return true;
 			}
-			return true;
 		} catch (AuthenticationFailedException e) {
 			Log.e(SendEmailAsyncTask.class.getName(), "Bad account details");
 			e.printStackTrace();
-		} catch (MessagingException e) {
+		/*} catch (MessagingException e) {
 			Log.e(SendEmailAsyncTask.class.getName(), e.getMessage());
-			e.printStackTrace();
+			e.printStackTrace();*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Toast.makeText(activity, MainActivity.context.getString(R.string.send_email_error), Toast.LENGTH_LONG).show();
+		activity.runOnUiThread(new Runnable() {
+			public void run() {
+				Toast.makeText(activity, MainActivity.context.getString(R.string.send_email_error), Toast.LENGTH_LONG).show();
+			}
+		});
 		return false;
 	}
 }

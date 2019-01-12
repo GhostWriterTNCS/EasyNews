@@ -56,9 +56,9 @@ public final class RssFeedManager {
 				if (eventType == XmlPullParser.END_TAG) {
 					if (name.equalsIgnoreCase("item")) {
 						if (title != null && link != null && description != null && pubDate != null) {
-							if(link.contains("://multiplayer.it/") && image != null) {
+							if (link.contains("://multiplayer.it/") && image != null) {
 								image = image.replace("_100x55_crop_", "_800x0_crop_");
-							} else if(link.contains("://www.everyeye.it/")) {
+							} else if (link.contains("://www.everyeye.it/")) {
 								pubDate.setTime(pubDate.getTime() - 3600 * 1000);
 							}
 							items.add(new RssFeed(channelTitle, title, link, description, pubDate, image));
@@ -108,7 +108,7 @@ public final class RssFeedManager {
 							description = description.substring(description.indexOf("/>") + 2).trim();
 						}
 					}
-					if(description.contains("<")) {
+					if (description.contains("<")) {
 						description = Html.fromHtml(description).toString();
 						description = description.replaceAll("[\n|\r]+", " ");
 						description = description.trim();
@@ -121,7 +121,7 @@ public final class RssFeedManager {
 					}
 				}
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			Log.e(MainActivity.TAG, "Error", e);
 		}
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
@@ -137,14 +137,14 @@ public final class RssFeedManager {
 			oo.writeObject(rssFeed);
 			oo.close();
 			return new String(Base64.encode(bo.toByteArray(), Base64.DEFAULT));
-		} catch(Exception e) {
+		} catch (Exception e) {
 			Log.e(MainActivity.TAG, "Serialize error: " + e.toString());
 			return null;
 		}
 	}
 
 	public static RssFeed Deserialize(String s) {
-		if(s == null) {
+		if (s == null) {
 			return null;
 		}
 		try {
@@ -165,14 +165,14 @@ public final class RssFeedManager {
 			oo.writeObject(rssFeeds);
 			oo.close();
 			return new String(Base64.encode(bo.toByteArray(), Base64.DEFAULT));
-		} catch(Exception e) {
+		} catch (Exception e) {
 			Log.e(MainActivity.TAG, "Serialize error: " + e.toString());
 			return null;
 		}
 	}
 
 	public static ArrayList<RssFeed> DeserializeList(String s) {
-		if(s == null) {
+		if (s == null) {
 			return new ArrayList<>();
 		}
 		try {
