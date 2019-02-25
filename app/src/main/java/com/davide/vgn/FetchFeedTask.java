@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,6 +31,8 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	protected ArrayList<RssFeed> rssFeeds = new ArrayList<>();
 	protected AppCompatActivity activity;
 	protected SwipeRefreshLayout mSwipeLayout;
+	public static Date previousDate = null;
+	long newFeedsCount = 0;
 
 	protected FetchFeedTask(AppCompatActivity activity, SwipeRefreshLayout mSwipeLayout) {
 		this.activity = activity;
@@ -87,15 +90,18 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			if (previousFound) {
 				break;
 			}
+			newFeedsCount = 0;
 			String prevLastNews = MainActivity.sp.getString("previous_" + index, null);
 			if (prevLastNews != null) {
 				for (int i = 0; i < rssFeeds.size(); i++) {
 					String s = rssFeeds.get(i).title + "@" + rssFeeds.get(i).channelTitle;
 					if (s.equals(prevLastNews)) {
 						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news), null, null, null, null));
+						previousDate = rssFeeds.get(i).pubDate;
 						previousFound = true;
 						break;
 					}
+					newFeedsCount++;
 				}
 			}
 		}
@@ -108,6 +114,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 							Toast.LENGTH_LONG).show();
 				}
 			});
+			newFeedsCount = 0;
 		}
 
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
@@ -132,6 +139,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			rssFeeds.add(new RssFeed(null, MainActivity.context.getString(R.string.no_news), null, null, null, null));
 		}
 
+		int i = 1;
 		for (final RssFeed rssFeed : rssFeeds) {
 			View child = activity.getLayoutInflater().inflate(R.layout.item_rss_feed, null);
 
@@ -140,6 +148,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				child.findViewById(R.id.titleGroup).setVisibility(View.GONE);
 				child.findViewById(R.id.subtitleText).setVisibility(View.GONE);
 				child.findViewById(R.id.descriptionText).setVisibility(View.GONE);
+				i = 0;
 			} else {
 				child.findViewById(R.id.verticalLayout).setOnLongClickListener(new View.OnLongClickListener() {
 					@Override
@@ -190,7 +199,12 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 					channelTitle = channelTitle.substring(0, channelTitle.indexOf("/"));
 				}
 				DateFormat myFormatter = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault());
-				String subtitle = channelTitle + " - " + myFormatter.format(rssFeed.pubDate);
+				String count = "";
+				if (newFeedsCount > 0 && i > 0) {
+					count = i + "/" + newFeedsCount + " ";
+					i++;
+				}
+				String subtitle = count + channelTitle + " - " + myFormatter.format(rssFeed.pubDate);
 				((TextView) child.findViewById(R.id.subtitleText)).setText(subtitle);
 				if (rssFeed.image != null) {
 					ImageView imageView = ((ImageView) child.findViewById(R.id.imageView));

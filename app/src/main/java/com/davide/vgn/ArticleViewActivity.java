@@ -24,6 +24,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 	private RssFeed rssFeed;
 	private SwipeRefreshLayout mSwipeLayout;
 	private WebView mWebView;
+	private String url;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,12 @@ public class ArticleViewActivity extends AppCompatActivity {
 		// Get the Intent that started this activity and extract the string
 		Intent intent = getIntent();
 		rssFeed = RssFeedManager.Deserialize(intent.getStringExtra(MainActivity.EXTRA_RSS_FEED));
+		url = rssFeed.link;
+		if (url.startsWith("https://it.ign.com/") && !url.startsWith("https://it.ign.com/m/")) {
+			url = url.replace("https://it.ign.com/", "https://it.ign.com/m/");
+		}
+		Log.d(MainActivity.TAG, url);
+
 		mWebView = ((WebView) findViewById(R.id.webView));
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
@@ -54,9 +61,6 @@ public class ArticleViewActivity extends AppCompatActivity {
 
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				if (url.startsWith("https://it.ign.com/") && !url.startsWith("https://it.ign.com/m/")) {
-					url = url.replace("https://it.ign.com/", "https://it.ign.com/m/");
-				}
 				if (view.getHitTestResult().getType() > 0) {
 					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 					startActivity(i);
@@ -72,13 +76,13 @@ public class ArticleViewActivity extends AppCompatActivity {
 		setTitle(rssFeed.title);
 
 		mSwipeLayout.setRefreshing(true);
-		mWebView.loadUrl(rssFeed.link);
+		mWebView.loadUrl(url);
 
 		mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh() {
 				mSwipeLayout.setRefreshing(true);
-				mWebView.loadUrl(rssFeed.link);
+				mWebView.loadUrl(url);
 			}
 		});
 	}
