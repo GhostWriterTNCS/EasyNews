@@ -73,6 +73,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 	}
 
 	public static String filename = "bookmarks.json";
+
 	public void ExportJSON() {
 		List<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
 		JSONArray jsonObject = new JSONArray();
@@ -88,7 +89,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 				jsonObject.put(j);
 			}
 			Log.d("JSON", jsonObject.toString());
-			if(CustomIO.WriteFile("VGN", filename, jsonObject.toString())) {
+			if (CustomIO.WriteFile("VGN", filename, jsonObject.toString())) {
 				Toast.makeText(activity, MainActivity.context.getString(R.string.export_json_success), Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -110,7 +111,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 						j.getString("link"),
 						j.getString("description"),
 						RssFeedManager.formatter.parse(j.getString("pubDate")),
-						j.getString("image")
+						j.has("image") ? j.getString("image") : null
 				));
 			}
 			SharedPreferences.Editor editor = MainActivity.sp.edit();
