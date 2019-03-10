@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
 	public static Context context;
 	public static SharedPreferences sp;
+	public static int attempts = 3;
 
 	public static AppCompatActivity activity;
 	private SwipeRefreshLayout mSwipeLayout;

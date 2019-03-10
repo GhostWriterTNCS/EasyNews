@@ -62,7 +62,18 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				inputStream.close();
 			} catch (Exception e) {
 				Log.e(MainActivity.TAG, "Error", e);
-				return false;
+				if (MainActivity.attempts > 0) {
+					MainActivity.attempts--;
+					return false;
+				} else {
+					final String s = urlLink;
+					activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(activity, s + " failed", Toast.LENGTH_LONG).show();
+						}
+					});
+				}
 			}
 		}
 		if (rssFeeds.size() == 0) {
