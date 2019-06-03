@@ -132,11 +132,11 @@ public class ArticleViewActivity extends AppCompatActivity {
 
 class SendEmailAsyncTask extends AsyncTask<Void, Void, Boolean> {
 	GMailSender sender = new GMailSender("", "");
-	ArticleViewActivity activity;
+	AppCompatActivity activity;
 	String title;
 	String body;
 
-	public SendEmailAsyncTask(ArticleViewActivity activity, String title, String body) {
+	public SendEmailAsyncTask(AppCompatActivity activity, String title, String body) {
 		this.activity = activity;
 		this.title = title;
 		this.body = body;

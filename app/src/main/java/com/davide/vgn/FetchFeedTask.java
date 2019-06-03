@@ -116,6 +116,26 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				}
 			}
 		}
+
+		boolean previousBackupFound = false;
+		for (int index = 0; index < previousLogLength; index++) {
+			if (previousBackupFound) {
+				break;
+			}
+			String prevLastNews = MainActivity.sp.getString("previous_backup_" + index, null);
+			if (prevLastNews != null) {
+				for (int i = 0; i < rssFeeds.size(); i++) {
+					String s = rssFeeds.get(i).title + "@" + rssFeeds.get(i).channelTitle;
+					if (s.equals(prevLastNews)) {
+						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news_backup), null, null, null, null));
+						previousDate = rssFeeds.get(i).pubDate;
+						previousBackupFound = true;
+						break;
+					}
+				}
+			}
+		}
+
 		if (!previousFound) {
 			activity.runOnUiThread(new Runnable() {
 				@Override
@@ -129,6 +149,11 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		}
 
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
+		for (int index = 0; index < previousLogLength; index++) {
+			if (MainActivity.sp.getString("previous_" + index, null) != null) {
+				editor.putString("previous_backup_" + index, MainActivity.sp.getString("previous_" + index, null));
+			}
+		}
 		for (int index = 0; index < lastNews.size(); index++) {
 			editor.putString("previous_" + index, lastNews.get(index));
 		}

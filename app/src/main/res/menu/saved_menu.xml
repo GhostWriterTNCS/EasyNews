@@ -13,4 +13,7 @@
     <item
         android:id="@+id/import_json"
         android:title="@string/import_json" />
+    <item
+        android:id="@+id/send_json"
+        android:title="@string/send_json" />
 </menu>

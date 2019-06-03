@@ -68,13 +68,16 @@ public class SavedArticlesActivity extends AppCompatActivity {
 			case R.id.import_json:
 				ImportJSON();
 				return true;
+			case R.id.send_json:
+				SendJSON();
+				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
 	public static String filename = "bookmarks.json";
 
-	public void ExportJSON() {
+	public String RssFeedsToJSON() {
 		List<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
 		JSONArray jsonObject = new JSONArray();
 		try {
@@ -89,12 +92,20 @@ public class SavedArticlesActivity extends AppCompatActivity {
 				jsonObject.put(j);
 			}
 			Log.d("JSON", jsonObject.toString());
-			if (CustomIO.WriteFile("VGN", filename, jsonObject.toString())) {
+			return jsonObject.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	public void ExportJSON() {
+		String json = RssFeedsToJSON();
+		if (!json.isEmpty()) {
+			if (CustomIO.WriteFile("VGN", filename, json)) {
 				Toast.makeText(activity, MainActivity.context.getString(R.string.export_json_success), Toast.LENGTH_SHORT).show();
 				return;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		Toast.makeText(activity, MainActivity.context.getString(R.string.an_error_occurred), Toast.LENGTH_LONG).show();
 	}
@@ -126,6 +137,11 @@ public class SavedArticlesActivity extends AppCompatActivity {
 			Log.d("JSON", "Bookmarks not imported.");
 			Toast.makeText(activity, MainActivity.context.getString(R.string.an_error_occurred), Toast.LENGTH_LONG).show();
 		}
+	}
+
+	public void SendJSON() {
+		Toast.makeText(activity, MainActivity.context.getString(R.string.sending_email), Toast.LENGTH_SHORT).show();
+		new SendEmailAsyncTask(SavedArticlesActivity.this, "From VGN: bookmarks", RssFeedsToJSON()).execute();
 	}
 
 	private class SavedFetchFeedTask extends FetchFeedTask {
