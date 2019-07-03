@@ -43,6 +43,9 @@ public class ArticleViewActivity extends AppCompatActivity {
 		Log.d(MainActivity.TAG, url);
 
 		mWebView = ((WebView) findViewById(R.id.webView));
+		if (url.startsWith("https://www.gamasutra.com/") || url.startsWith("http://feedproxy.google.com/")) {
+			mWebView.getSettings().setJavaScriptEnabled(true);
+		}
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageFinished(WebView view, String url) {
