@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+	xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/bookmarks"
-        android:icon="@drawable/ic_bookmarks"
-        android:title="@string/bookmarks"
-        android:clickable="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        app:actionLayout="@layout/bookmarsk_count"
-        app:showAsAction="always" />
+	<item
+		android:id="@+id/settings"
+		android:title="@string/settings"></item>
+	<item
+		android:id="@+id/bookmarks"
+		android:icon="@drawable/ic_bookmarks"
+		android:title="@string/bookmarks"
+		android:clickable="true"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+		app:actionLayout="@layout/bookmarsk_count"
+		app:showAsAction="always"></item>
 </menu>

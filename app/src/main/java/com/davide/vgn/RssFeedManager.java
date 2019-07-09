@@ -171,6 +171,7 @@ public final class RssFeedManager {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public static ArrayList<RssFeed> DeserializeList(String s) {
 		if (s == null) {
 			return new ArrayList<>();

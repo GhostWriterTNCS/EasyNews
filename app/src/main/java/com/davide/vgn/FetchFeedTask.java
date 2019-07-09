@@ -42,13 +42,13 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected void onPreExecute() {
 		mSwipeLayout.setRefreshing(true);
-		feeds = new String[]{""};
+		feeds = MainActivity.sp.getString("urls", "").split("\n");
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... voids) {
 		for (String urlLink : feeds) {
-			if (TextUtils.isEmpty(urlLink)) {
+			if (urlLink.isEmpty() || urlLink.startsWith("#")) {
 				continue;
 			}
 			try {
@@ -62,17 +62,16 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				inputStream.close();
 			} catch (Exception e) {
 				Log.e(MainActivity.TAG, "Error", e);
+				final String s = urlLink;
+				activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(activity, s + " failed", Toast.LENGTH_LONG).show();
+					}
+				});
 				if (MainActivity.attempts > 0) {
 					MainActivity.attempts--;
 					return false;
-				} else {
-					final String s = urlLink;
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(activity, s + " failed", Toast.LENGTH_LONG).show();
-						}
-					});
 				}
 			}
 		}

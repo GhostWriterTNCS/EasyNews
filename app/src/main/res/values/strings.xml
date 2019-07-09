@@ -19,4 +19,7 @@
 	<string name="send_email">Invia email</string>
 	<string name="sending_email">Invio la mail...</string>
 	<string name="send_email_error">Errore durante l\'invio della mail</string>
+	<string name="settings">Impostazioni</string>
+	<string name="confirm">Conferma</string>
+	<string name="done">Fatto</string>
 </resources>

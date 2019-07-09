@@ -12,8 +12,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -99,8 +99,7 @@ public class MainActivity extends AppCompatActivity {
 		bookmarksCount = (TextView) menu_hotlist.findViewById(R.id.text);
 		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null)).size();
 		bookmarksCount.setText(Integer.toString(rssFeedsSize));
-		RelativeLayout rl = (RelativeLayout) menu.findItem(R.id.bookmarks).getActionView();
-		rl.setOnClickListener(new View.OnClickListener() {
+		menu.findItem(R.id.bookmarks).getActionView().setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				Log.d(MainActivity.TAG, "BOOKMARKS");
@@ -110,6 +109,28 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
+		// Handle item selection
+		switch (item.getItemId()) {
+			/*case R.id.bookmarks:
+				Log.d(MainActivity.TAG, "BOOKMARKS");
+				intent = new Intent(MainActivity.activity, SavedArticlesActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				startActivity(intent);
+				return true;*/
+			case R.id.settings:
+				Log.d(MainActivity.TAG, "SETTINGS");
+				intent = new Intent(MainActivity.activity, SettingsActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				startActivity(intent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 	public static void updateRssFeedsSize() {
