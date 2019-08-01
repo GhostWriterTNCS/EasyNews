@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -25,6 +27,8 @@ public class ArticleViewActivity extends AppCompatActivity {
 	private SwipeRefreshLayout mSwipeLayout;
 	private WebView mWebView;
 	private String url;
+	private Menu menu;
+	private FloatingActionButton fab;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,17 +92,52 @@ public class ArticleViewActivity extends AppCompatActivity {
 				mWebView.loadUrl(url);
 			}
 		});
+		fab = findViewById(R.id.fab);
+		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		if (!rssFeeds.contains(rssFeed)) {
+			fab.setImageResource(R.drawable.ic_bookmark_outline);
+		} else {
+			fab.setImageResource(R.drawable.ic_bookmark);
+		}
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				changeBookmarkStatus();
+			}
+		});
+	}
+
+	void changeBookmarkStatus() {
+		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		boolean newStatus;
+		if (!rssFeeds.contains(rssFeed)) {
+			rssFeeds.add(0, rssFeed);
+			fab.setImageResource(R.drawable.ic_bookmark);
+			if (menu != null)
+				menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark, null));
+		} else {
+			rssFeeds.remove(rssFeed);
+			fab.setImageResource(R.drawable.ic_bookmark_outline);
+			if (menu != null)
+				menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_outline, null));
+		}
+		SharedPreferences.Editor editor = MainActivity.sp.edit();
+		editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
+		editor.apply();
+		MainActivity.updateRssFeedsSize();
+
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		this.menu = menu;
 		getMenuInflater().inflate(R.menu.article_menu, menu);
 		MainActivity.sp = getSharedPreferences(MainActivity.TAG, MODE_PRIVATE);
 		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
-		if (!rssFeeds.contains(rssFeed)) {
-			menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_outline, null));
-		} else {
+		if (rssFeeds.contains(rssFeed)) {
 			menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark, null));
+		} else {
+			menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_outline, null));
 		}
 		return true;
 	}
@@ -107,18 +146,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.bookmark:
-				ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
-				if (!rssFeeds.contains(rssFeed)) {
-					rssFeeds.add(0, rssFeed);
-					item.setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark, null));
-				} else {
-					rssFeeds.remove(rssFeed);
-					item.setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_outline, null));
-				}
-				SharedPreferences.Editor editor = MainActivity.sp.edit();
-				editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
-				editor.apply();
-				MainActivity.updateRssFeedsSize();
+				changeBookmarkStatus();
 				return true;
 			case R.id.send_email:
 				Toast.makeText(ArticleViewActivity.this, MainActivity.context.getString(R.string.sending_email), Toast.LENGTH_SHORT).show();
@@ -132,6 +160,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 }
+
 
 class SendEmailAsyncTask extends AsyncTask<Void, Void, Boolean> {
 	GMailSender sender = new GMailSender("", "");
