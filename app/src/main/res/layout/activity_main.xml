@@ -13,7 +13,8 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/colorBackground">
 
             <LinearLayout
                 android:id="@+id/verticalLayout"
@@ -21,8 +22,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="10dp">
+                android:paddingTop="10dp"
+                android:paddingRight="10dp">
 
             </LinearLayout>
         </ScrollView>

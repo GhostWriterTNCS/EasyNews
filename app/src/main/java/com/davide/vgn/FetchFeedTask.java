@@ -1,5 +1,6 @@
 package com.davide.vgn;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -167,7 +168,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	}
 
 	protected void onPostExecute(Boolean success, final boolean bookmars) {
-		LinearLayout linearLayout = (LinearLayout) activity.findViewById(R.id.verticalLayout);
+		LinearLayout linearLayout = (LinearLayout) ((Activity) activity).findViewById(R.id.verticalLayout);
 		linearLayout.removeAllViewsInLayout();
 		if (!success) {
 			rssFeeds.clear();
@@ -190,7 +191,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 					public boolean onLongClick(View view) {
 						ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
 						if (!rssFeeds.contains(rssFeed)) {
-							rssFeeds.add(0, rssFeed);
+							rssFeeds.add(rssFeed);
 							Toast.makeText(MainActivity.context, "[+] " + rssFeed.title, Toast.LENGTH_SHORT).show();
 						/*} else {
 							rssFeeds.remove(rssFeed);

@@ -109,9 +109,8 @@ public class ArticleViewActivity extends AppCompatActivity {
 
 	void changeBookmarkStatus() {
 		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
-		boolean newStatus;
 		if (!rssFeeds.contains(rssFeed)) {
-			rssFeeds.add(0, rssFeed);
+			rssFeeds.add(rssFeed);
 			fab.setImageResource(R.drawable.ic_bookmark);
 			if (menu != null)
 				menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark, null));
