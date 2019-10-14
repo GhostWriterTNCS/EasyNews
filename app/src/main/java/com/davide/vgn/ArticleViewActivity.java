@@ -19,6 +19,8 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.mail.AuthenticationFailedException;
 
@@ -105,6 +107,13 @@ public class ArticleViewActivity extends AppCompatActivity {
 				changeBookmarkStatus();
 			}
 		});
+
+		Set<String> viewedArticles = new HashSet<>();
+		viewedArticles.addAll(MainActivity.sp.getStringSet("viewed", new HashSet<String>()));
+		viewedArticles.add(rssFeed.link);
+		SharedPreferences.Editor editor = MainActivity.sp.edit();
+		editor.putStringSet("viewed", viewedArticles);
+		editor.apply();
 	}
 
 	void changeBookmarkStatus() {

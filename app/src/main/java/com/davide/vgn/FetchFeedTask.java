@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	private String[] feeds;
@@ -168,6 +170,9 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	}
 
 	protected void onPostExecute(Boolean success, final boolean bookmars) {
+		Set<String> viewedArticles = new HashSet<>();
+		viewedArticles.addAll(MainActivity.sp.getStringSet("viewed", new HashSet<String>()));
+
 		LinearLayout linearLayout = (LinearLayout) ((Activity) activity).findViewById(R.id.verticalLayout);
 		linearLayout.removeAllViewsInLayout();
 		if (!success) {
@@ -246,6 +251,12 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 					ImageView imageView = ((ImageView) child.findViewById(R.id.imageView));
 					imageView.setVisibility(View.VISIBLE);
 					Picasso.get().load(rssFeed.image).into(imageView);
+				}
+
+				if (viewedArticles.contains(rssFeed.link)) {
+					((TextView) child.findViewById(R.id.titleText)).setTextColor(MainActivity.activity.getResources().getColor(R.color.colorPrimary));
+					((TextView) child.findViewById(R.id.subtitleText)).setTextColor(MainActivity.activity.getResources().getColor(R.color.colorPrimary));
+					((TextView) child.findViewById(R.id.descriptionText)).setTextColor(MainActivity.activity.getResources().getColor(R.color.colorPrimary));
 				}
 			}
 
