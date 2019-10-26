@@ -81,6 +81,24 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		if (rssFeeds.size() == 0) {
 			return false;
 		}
+
+		if (MainActivity.sp.getString("previous_timestamp", null) != null) {
+			try {
+				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp", null));
+				rssFeeds.add(new RssFeed(null, "Previous timestamp", null, null, previous, null));
+			} catch (Exception ex) {
+
+			}
+		}
+		if (MainActivity.sp.getString("previous_timestamp_backup", null) != null) {
+			try {
+				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp_backup", null));
+				rssFeeds.add(new RssFeed(null, "Previous timestamp (backup)", null, null, previous, null));
+			} catch (Exception ex) {
+
+			}
+		}
+
 		Collections.sort(rssFeeds, new Comparator<RssFeed>() {
 			@Override
 			public int compare(RssFeed a, RssFeed b) {
@@ -159,6 +177,10 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		for (int index = 0; index < lastNews.size(); index++) {
 			editor.putString("previous_" + index, lastNews.get(index));
 		}
+		if (MainActivity.sp.getString("previous_timestamp", null) != null) {
+			editor.putString("previous_timestamp_backup", MainActivity.sp.getString("previous_timestamp", null));
+		}
+		editor.putString("previous_timestamp", RssFeedManager.formatter.format(new Date()));
 		editor.apply();
 		return true;
 	}
