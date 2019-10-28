@@ -85,7 +85,8 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		if (MainActivity.sp.getString("previous_timestamp", null) != null) {
 			try {
 				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp", null));
-				rssFeeds.add(new RssFeed(null, "Previous timestamp", null, null, previous, null));
+				DateFormat format = new SimpleDateFormat("HH:mm");
+				rssFeeds.add(new RssFeed(null, "Timestamp " + format.format(previous), null, null, previous, null));
 			} catch (Exception ex) {
 
 			}

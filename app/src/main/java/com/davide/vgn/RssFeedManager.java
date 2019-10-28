@@ -23,7 +23,6 @@ import java.util.Locale;
 
 public final class RssFeedManager {
 	public static final DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-	public static final DateFormat formatterIta = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ITALIAN);
 
 	public static List<RssFeed> parseFeed(InputStream inputStream) {
 		List<RssFeed> items = new ArrayList<>();
@@ -58,8 +57,6 @@ public final class RssFeedManager {
 						if (title != null && link != null && description != null && pubDate != null) {
 							if (link.contains("://multiplayer.it/") && image != null) {
 								image = image.replace("_100x55_crop_", "_800x0_crop_");
-							} else if (link.contains("://www.everyeye.it/")) {
-								pubDate.setTime(pubDate.getTime() - 3600 * 1000);
 							}
 							items.add(new RssFeed(channelTitle, title, link, description, pubDate, image));
 							title = null;
