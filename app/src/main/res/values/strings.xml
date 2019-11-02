@@ -3,7 +3,7 @@
 	<string name="short_name">VGN</string>
 	<string name="old_news">Articoli precedenti</string>
 	<string name="old_news_backup">Articoli precedenti (backup)</string>
-	<string name="previous_last_not_found">Ultimo articolo precedente non trovato.</string>
+	<string name="previous_last_not_found">Articoli precedenti non trovati.</string>
 	<string name="no_news">Nessun articolo trovato</string>
 	<string name="bookmarks">Articoli salvati</string>
 	<string name="export_json">Esporta JSON</string>

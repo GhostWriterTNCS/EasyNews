@@ -35,7 +35,8 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	protected AppCompatActivity activity;
 	protected SwipeRefreshLayout mSwipeLayout;
 	public static Date previousDate = null;
-	long newFeedsCount = 0;
+	int newFeedsCount = 0;
+	String timestampLink = "timestamp";
 
 	protected FetchFeedTask(AppCompatActivity activity, SwipeRefreshLayout mSwipeLayout) {
 		this.activity = activity;
@@ -86,7 +87,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			try {
 				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp", null));
 				DateFormat format = new SimpleDateFormat("HH:mm");
-				rssFeeds.add(new RssFeed(null, "Timestamp " + format.format(previous), null, null, previous, null));
+				rssFeeds.add(new RssFeed(null, "Timestamp " + format.format(previous), timestampLink, null, previous, null));
 			} catch (Exception ex) {
 
 			}
@@ -94,7 +95,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		if (MainActivity.sp.getString("previous_timestamp_backup", null) != null) {
 			try {
 				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp_backup", null));
-				rssFeeds.add(new RssFeed(null, "Previous timestamp (backup)", null, null, previous, null));
+				rssFeeds.add(new RssFeed(null, "Previous timestamp (backup)", timestampLink, null, previous, null));
 			} catch (Exception ex) {
 
 			}
@@ -106,6 +107,13 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				return b.pubDate.compareTo(a.pubDate);
 			}
 		});
+
+		for (int i = 0; i < rssFeeds.size(); i++) {
+			if (rssFeeds.get(i).link == timestampLink) {
+				break;
+			}
+			newFeedsCount++;
+		}
 
 		int previousLogLength = 10;
 		boolean previousFound = false;
@@ -122,7 +130,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			if (previousFound) {
 				break;
 			}
-			newFeedsCount = 0;
+			//newFeedsCount = 0;
 			String prevLastNews = MainActivity.sp.getString("previous_" + index, null);
 			if (prevLastNews != null) {
 				for (int i = 0; i < rssFeeds.size(); i++) {
@@ -133,7 +141,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 						previousFound = true;
 						break;
 					}
-					newFeedsCount++;
+					//newFeedsCount++;
 				}
 			}
 		}
@@ -207,7 +215,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		for (final RssFeed rssFeed : rssFeeds) {
 			View child = activity.getLayoutInflater().inflate(R.layout.item_rss_feed, null);
 
-			if (rssFeed.link == null) {
+			if (rssFeed.link == null || rssFeed.link == timestampLink) {
 				((TextView) child.findViewById(R.id.breakText)).setText(rssFeed.title);
 				child.findViewById(R.id.titleGroup).setVisibility(View.GONE);
 				child.findViewById(R.id.subtitleText).setVisibility(View.GONE);
