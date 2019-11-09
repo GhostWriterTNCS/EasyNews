@@ -24,6 +24,8 @@ import java.util.Set;
 
 import javax.mail.AuthenticationFailedException;
 
+import static com.davide.vgn.MainActivity.context;
+
 public class ArticleViewActivity extends AppCompatActivity {
 	private RssFeed rssFeed;
 	private SwipeRefreshLayout mSwipeLayout;
@@ -43,13 +45,15 @@ public class ArticleViewActivity extends AppCompatActivity {
 		Intent intent = getIntent();
 		rssFeed = RssFeedManager.Deserialize(intent.getStringExtra(MainActivity.EXTRA_RSS_FEED));
 		url = rssFeed.link;
-		if (url.startsWith("https://it.ign.com/") && !url.startsWith("https://it.ign.com/m/")) {
-			url = url.replace("https://it.ign.com/", "https://it.ign.com/m/");
-		}
+		/*if (urls.startsWith("https://it.ign.com/") && !urls.startsWith("https://it.ign.com/m/")) {
+			urls = urls.replace("https://it.ign.com/", "https://it.ign.com/m/");
+		}*/
 		Log.d(MainActivity.TAG, url);
 
 		mWebView = ((WebView) findViewById(R.id.webView));
-		if (url.startsWith("https://www.gamasutra.com/") || url.startsWith("http://feedproxy.google.com/")) {
+		String domain = url.substring(url.indexOf("//") + 2);
+		domain = domain.substring(0, domain.indexOf("/"));
+		if (MainActivity.sp.getString(Strings.urlsJS, "").contains("://" + domain + "/")) {
 			mWebView.getSettings().setJavaScriptEnabled(true);
 		}
 		mWebView.setWebViewClient(new WebViewClient() {
@@ -65,7 +69,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 						"WebView error " + errorCode,
 						Toast.LENGTH_LONG).show();
 				Log.e(MainActivity.TAG, "WebView error " + errorCode
-						+ ": " + description + " (url: " + failingUrl + ")");
+						+ ": " + description + " (urls: " + failingUrl + ")");
 			}
 
 			@Override
@@ -95,7 +99,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 			}
 		});
 		fab = findViewById(R.id.fab);
-		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null));
 		if (!rssFeeds.contains(rssFeed)) {
 			fab.setImageResource(R.drawable.ic_bookmark_outline);
 		} else {
@@ -109,15 +113,15 @@ public class ArticleViewActivity extends AppCompatActivity {
 		});
 
 		Set<String> viewedArticles = new HashSet<>();
-		viewedArticles.addAll(MainActivity.sp.getStringSet("viewed", new HashSet<String>()));
+		viewedArticles.addAll(MainActivity.sp.getStringSet(Strings.viewed, new HashSet<String>()));
 		viewedArticles.add(rssFeed.link);
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
-		editor.putStringSet("viewed", viewedArticles);
+		editor.putStringSet(Strings.viewed, viewedArticles);
 		editor.apply();
 	}
 
 	void changeBookmarkStatus() {
-		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null));
 		if (!rssFeeds.contains(rssFeed)) {
 			rssFeeds.add(rssFeed);
 			fab.setImageResource(R.drawable.ic_bookmark);
@@ -130,7 +134,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 				menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark_outline, null));
 		}
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
-		editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
+		editor.putString(Strings.savedNews, RssFeedManager.SerializeList(rssFeeds));
 		editor.apply();
 		MainActivity.updateRssFeedsSize();
 
@@ -141,7 +145,7 @@ public class ArticleViewActivity extends AppCompatActivity {
 		this.menu = menu;
 		getMenuInflater().inflate(R.menu.article_menu, menu);
 		MainActivity.sp = getSharedPreferences(MainActivity.TAG, MODE_PRIVATE);
-		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null));
 		if (rssFeeds.contains(rssFeed)) {
 			menu.findItem(R.id.bookmark).setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bookmark, null));
 		} else {
@@ -157,8 +161,8 @@ public class ArticleViewActivity extends AppCompatActivity {
 				changeBookmarkStatus();
 				return true;
 			case R.id.send_email:
-				Toast.makeText(ArticleViewActivity.this, MainActivity.context.getString(R.string.sending_email), Toast.LENGTH_SHORT).show();
-				new SendEmailAsyncTask(ArticleViewActivity.this, "From VGN: " + rssFeed.title, rssFeed.link).execute();
+				Toast.makeText(ArticleViewActivity.this, context.getString(R.string.sending_email), Toast.LENGTH_SHORT).show();
+				new SendEmailAsyncTask(ArticleViewActivity.this, "[Easy News] " + rssFeed.title, rssFeed.link).execute();
 				return true;
 			case R.id.open_in_browser:
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssFeed.link));
@@ -171,41 +175,49 @@ public class ArticleViewActivity extends AppCompatActivity {
 
 
 class SendEmailAsyncTask extends AsyncTask<Void, Void, Boolean> {
-	GMailSender sender = new GMailSender("", "");
 	AppCompatActivity activity;
-	String title;
+	String subject;
 	String body;
 
-	public SendEmailAsyncTask(AppCompatActivity activity, String title, String body) {
+	public SendEmailAsyncTask(AppCompatActivity activity, String subject, String body) {
 		this.activity = activity;
-		this.title = title;
+		this.subject = subject;
 		this.body = body;
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		if (BuildConfig.DEBUG) Log.v(SendEmailAsyncTask.class.getName(), "doInBackground()");
-		try {
-			if (sender.sendMail(title, // subject
-					body, // body
-					"bot@vgn.com", // sender
-					"")) { // recipients
-				return true;
-			}
-		} catch (AuthenticationFailedException e) {
-			Log.e(SendEmailAsyncTask.class.getName(), "Bad account details");
-			e.printStackTrace();
+		if (MainActivity.sp.getString(Strings.emailFrom, "").isEmpty()) {
+			String mailto = "mailto:" + MainActivity.sp.getString(Strings.emailTo, "") +
+					"?subject=" + Uri.encode(subject) +
+					"&body=" + Uri.encode(body);
+			Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(mailto));
+			activity.startActivity(Intent.createChooser(emailIntent, MainActivity.context.getString(R.string.send_email)));
+			return true;
+		} else {
+			GMailSender sender = new GMailSender(MainActivity.sp.getString(Strings.emailFrom, ""), MainActivity.sp.getString(Strings.emailPassword, ""));
+			try {
+				if (sender.sendMail(subject, // subject
+						body, // body
+						"bot@easynews.com", // sender
+						MainActivity.sp.getString(Strings.emailTo, ""))) { // recipients
+					return true;
+				}
+			} catch (AuthenticationFailedException e) {
+				Toast.makeText(activity, context.getString(R.string.send_email_error), Toast.LENGTH_LONG).show();
+				e.printStackTrace();
 		/*} catch (MessagingException e) {
 			Log.e(SendEmailAsyncTask.class.getName(), e.getMessage());
 			e.printStackTrace();*/
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		activity.runOnUiThread(new Runnable() {
-			public void run() {
-				Toast.makeText(activity, MainActivity.context.getString(R.string.send_email_error), Toast.LENGTH_LONG).show();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
-		return false;
+			activity.runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(activity, context.getString(R.string.send_email_error), Toast.LENGTH_LONG).show();
+				}
+			});
+			return false;
+		}
 	}
 }

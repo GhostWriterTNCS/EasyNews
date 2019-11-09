@@ -24,7 +24,7 @@ import java.util.Locale;
 public final class RssFeedManager {
 	public static final DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
 
-	public static List<RssFeed> parseFeed(InputStream inputStream) {
+	public static List<RssFeed> parseFeed(InputStream inputStream) throws Exception {
 		List<RssFeed> items = new ArrayList<>();
 		String channelTitle = null;
 		String title = null;
@@ -38,88 +38,84 @@ public final class RssFeedManager {
 		}
 
 		boolean isItem = false;
-		try {
-			XmlPullParser xmlPullParser = Xml.newPullParser();
-			xmlPullParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-			xmlPullParser.setInput(inputStream, null);
+		XmlPullParser xmlPullParser = Xml.newPullParser();
+		xmlPullParser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+		xmlPullParser.setInput(inputStream, null);
 
-			xmlPullParser.nextTag();
-			while (xmlPullParser.next() != XmlPullParser.END_DOCUMENT) {
-				int eventType = xmlPullParser.getEventType();
+		xmlPullParser.nextTag();
+		while (xmlPullParser.next() != XmlPullParser.END_DOCUMENT) {
+			int eventType = xmlPullParser.getEventType();
 
-				String name = xmlPullParser.getName();
-				//Log.d("MainActivity", "Parsing name ==> " + name);
-				if (name == null)
-					continue;
+			String name = xmlPullParser.getName();
+			//Log.d("MainActivity", "Parsing name ==> " + name);
+			if (name == null)
+				continue;
 
-				if (eventType == XmlPullParser.END_TAG) {
-					if (name.equalsIgnoreCase("item")) {
-						if (title != null && link != null && description != null && pubDate != null) {
-							if (link.contains("://multiplayer.it/") && image != null) {
-								image = image.replace("_100x55_crop_", "_800x0_crop_");
-							}
-							items.add(new RssFeed(channelTitle, title, link, description, pubDate, image));
-							title = null;
-							link = null;
-							description = null;
-							pubDate = null;
+			if (eventType == XmlPullParser.END_TAG) {
+				if (name.equalsIgnoreCase("item")) {
+					if (title != null && link != null && description != null && pubDate != null) {
+						if (link.contains("://multiplayer.it/") && image != null) {
+							image = image.replace("_100x55_crop_", "_800x0_crop_");
 						}
-						isItem = false;
+						items.add(new RssFeed(channelTitle, title, link, description, pubDate, image));
+						title = null;
+						link = null;
+						description = null;
+						pubDate = null;
 					}
+					isItem = false;
+				}
+				continue;
+			}
+
+			if (eventType == XmlPullParser.START_TAG) {
+				if (name.equalsIgnoreCase("item")) {
+					isItem = true;
 					continue;
-				}
-
-				if (eventType == XmlPullParser.START_TAG) {
-					if (name.equalsIgnoreCase("item")) {
-						isItem = true;
-						continue;
-					} else if (name.equalsIgnoreCase("channel")) {
-						continue;
-					}
-				}
-
-				String result = "";
-				if (xmlPullParser.next() == XmlPullParser.TEXT) {
-					result = xmlPullParser.getText().trim();
-					xmlPullParser.nextTag();
-				}
-				//Log.d("MainActivity", "Parsing name ==> " + name + ": " + result);
-
-				if (name.equalsIgnoreCase("title")) {
-					if (isItem) {
-						title = result;
-					} else {
-						channelTitle = result;
-					}
-				} else if (name.equalsIgnoreCase("link")) {
-					link = result;
-				} else if (name.equalsIgnoreCase("channelTitle")) {
-					channelTitle = result;
-				} else if (name.equalsIgnoreCase("description")) {
-					description = result;
-					if (description.contains("<img")) {
-						if (description.contains("/>")) {
-							image = description.substring(0, description.indexOf("/>"));
-							image = image.substring(image.indexOf("src=\"") + 5);
-							image = image.substring(0, image.indexOf("\""));
-							description = description.substring(description.indexOf("/>") + 2).trim();
-						}
-					}
-					if (description.contains("<")) {
-						description = Html.fromHtml(description).toString();
-						description = description.replaceAll("[\n|\r]+", " ");
-						description = description.trim();
-					}
-				} else if (name.equalsIgnoreCase("pubDate")) {
-					try {
-						pubDate = RssFeedManager.formatter.parse(result);
-					} catch (ParseException e) {
-						Log.e("MainActivity", "DateFormat error: " + e.toString());
-					}
+				} else if (name.equalsIgnoreCase("channel")) {
+					continue;
 				}
 			}
-		} catch (Exception e) {
-			Log.e(MainActivity.TAG, "Error", e);
+
+			String result = "";
+			if (xmlPullParser.next() == XmlPullParser.TEXT) {
+				result = xmlPullParser.getText().trim();
+				xmlPullParser.nextTag();
+			}
+			//Log.d("MainActivity", "Parsing name ==> " + name + ": " + result);
+
+			if (name.equalsIgnoreCase("title")) {
+				if (isItem) {
+					title = result;
+				} else {
+					channelTitle = result;
+				}
+			} else if (name.equalsIgnoreCase("link")) {
+				link = result;
+			} else if (name.equalsIgnoreCase("channelTitle")) {
+				channelTitle = result;
+			} else if (name.equalsIgnoreCase("description")) {
+				description = result;
+				if (description.contains("<img")) {
+					if (description.contains("/>")) {
+						image = description.substring(0, description.indexOf("/>"));
+						image = image.substring(image.indexOf("src=\"") + 5);
+						image = image.substring(0, image.indexOf("\""));
+						description = description.substring(description.indexOf("/>") + 2).trim();
+					}
+				}
+				if (description.contains("<")) {
+					description = Html.fromHtml(description).toString();
+					description = description.replaceAll("[\n|\r]+", " ");
+					description = description.trim();
+				}
+			} else if (name.equalsIgnoreCase("pubDate")) {
+				try {
+					pubDate = RssFeedManager.formatter.parse(result);
+				} catch (ParseException e) {
+					Log.e("MainActivity", "DateFormat error: " + e.toString());
+				}
+			}
 		}
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
 		editor.putString("last_check", RssFeedManager.formatter.format(new Date()));

@@ -9,34 +9,201 @@
 	tools:context=".SettingsActivity"
 	tools:showIn="@layout/activity_settings">
 
-	<android.support.design.widget.TextInputLayout
-		android:id="@+id/textInputLayout"
+	<ScrollView
 		android:layout_width="match_parent"
-		android:layout_height="0dp"
+		android:layout_height="match_parent"
 		android:layout_marginStart="8dp"
 		android:layout_marginTop="8dp"
 		android:layout_marginEnd="8dp"
+		android:layout_marginBottom="8dp"
+		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent">
 
-		<android.support.design.widget.TextInputEditText
-			android:id="@+id/urlsInput"
+		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:textColor="@android:color/secondary_text_dark" />
+			android:orientation="vertical">
 
-	</android.support.design.widget.TextInputLayout>
+			<TextView
+				android:id="@+id/feedsTitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/feedsTitle"
+				android:textColor="@color/colorAccent"
+				android:textSize="24sp"
+				android:textStyle="bold" />
 
-	<Button
-		android:id="@+id/confirm"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginStart="8dp"
-		android:layout_marginTop="8dp"
-		android:layout_weight="1"
-		android:text="@string/confirm"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toBottomOf="@+id/textInputLayout" />
+			<TextView
+				android:id="@+id/textView6"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginBottom="-8dp"
+				android:text="@string/feedsWithoutJS"
+				android:textColor="@android:color/secondary_text_dark" />
+
+			<android.support.design.widget.TextInputLayout
+				android:id="@+id/textInputLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<android.support.design.widget.TextInputEditText
+					android:id="@+id/urlsInput"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:backgroundTint="@android:color/secondary_text_dark"
+					android:textColor="@android:color/secondary_text_dark" />
+
+			</android.support.design.widget.TextInputLayout>
+
+			<TextView
+				android:id="@+id/textView7"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="8dp"
+				android:layout_marginBottom="-8dp"
+				android:layout_weight="1"
+				android:text="@string/feedsWithJS"
+				android:textColor="@android:color/secondary_text_dark" />
+
+			<android.support.design.widget.TextInputLayout
+				android:id="@+id/textInputLayoutJS"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="1">
+
+				<android.support.design.widget.TextInputEditText
+					android:id="@+id/urlsInputJS"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:backgroundTint="@android:color/secondary_text_dark"
+					android:textColor="@android:color/secondary_text_dark" />
+
+			</android.support.design.widget.TextInputLayout>
+
+			<TextView
+				android:id="@+id/textView"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/feedsIgnore"
+				android:textColor="@android:color/secondary_text_dark" />
+
+			<Button
+				android:id="@+id/feedsSave"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/save" />
+
+			<View
+				android:id="@+id/divider"
+				android:layout_width="match_parent"
+				android:layout_height="1dp"
+				android:layout_marginTop="8dp"
+				android:layout_marginBottom="8dp"
+				android:background="@color/colorPrimary" />
+
+			<TextView
+				android:id="@+id/emailTitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/emailTitle"
+				android:textColor="@color/colorAccent"
+				android:textSize="24sp"
+				android:textStyle="bold" />
+
+			<TableLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+
+				<TableRow
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
+					<TextView
+						android:id="@+id/textView3"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/emailFrom"
+						android:textAlignment="textEnd"
+						android:textColor="@android:color/secondary_text_dark" />
+
+					<EditText
+						android:id="@+id/emailFrom"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:backgroundTint="@android:color/secondary_text_dark"
+						android:ems="10"
+						android:inputType="textEmailAddress"
+						android:textColor="@android:color/secondary_text_dark"
+						android:textColorHint="@android:color/secondary_text_dark_nodisable" />
+				</TableRow>
+
+				<TableRow
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
+					<TextView
+						android:id="@+id/textView4"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/emailPassword"
+						android:textAlignment="textEnd"
+						android:textColor="@android:color/secondary_text_dark" />
+
+					<EditText
+						android:id="@+id/emailPassword"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:backgroundTint="@android:color/secondary_text_dark"
+						android:ems="10"
+						android:inputType="textPassword"
+						android:textColor="@android:color/secondary_text_dark" />
+				</TableRow>
+
+				<TableRow
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
+					<TextView
+						android:id="@+id/textView5"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/emailTo"
+						android:textAlignment="textEnd"
+						android:textColor="@android:color/secondary_text_dark" />
+
+					<EditText
+						android:id="@+id/emailTo"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:layout_weight="1"
+						android:backgroundTint="@android:color/secondary_text_dark"
+						android:ems="10"
+						android:inputType="textEmailAddress"
+						android:textColor="@android:color/secondary_text_dark" />
+				</TableRow>
+
+			</TableLayout>
+
+			<TextView
+				android:id="@+id/textView9"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/emailHelp"
+				android:textColor="@android:color/secondary_text_dark" />
+
+			<Button
+				android:id="@+id/emailSave"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="@string/save" />
+
+		</LinearLayout>
+	</ScrollView>
 
 </android.support.constraint.ConstraintLayout>

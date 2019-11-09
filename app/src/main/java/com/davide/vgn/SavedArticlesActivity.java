@@ -55,7 +55,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 						.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								SharedPreferences.Editor editor = MainActivity.sp.edit();
-								editor.remove("saved_news");
+								editor.remove(Strings.savedNews);
 								editor.apply();
 								new SavedFetchFeedTask(activity, mSwipeLayout).execute((Void) null);
 							}
@@ -78,7 +78,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 	public static String filename = "bookmarks.json";
 
 	public String RssFeedsToJSON() {
-		List<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+		List<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null));
 		JSONArray jsonObject = new JSONArray();
 		try {
 			for (RssFeed rf : rssFeeds) {
@@ -102,7 +102,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 	public void ExportJSON() {
 		String json = RssFeedsToJSON();
 		if (!json.isEmpty()) {
-			if (CustomIO.WriteFile("VGN", filename, json)) {
+			if (CustomIO.WriteFile("Easy News", filename, json)) {
 				Toast.makeText(activity, MainActivity.context.getString(R.string.export_json_success), Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -112,7 +112,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 
 	public void ImportJSON() {
 		try {
-			JSONArray jsonObject = new JSONArray(CustomIO.ReadFile("VGN", filename));
+			JSONArray jsonObject = new JSONArray(CustomIO.ReadFile("Easy News", filename));
 			List<RssFeed> rssFeeds = new ArrayList<RssFeed>();
 			for (int i = 0; i < jsonObject.length(); i++) {
 				JSONObject j = jsonObject.getJSONObject(i);
@@ -126,7 +126,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 				));
 			}
 			SharedPreferences.Editor editor = MainActivity.sp.edit();
-			editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
+			editor.putString(Strings.savedNews, RssFeedManager.SerializeList(rssFeeds));
 			editor.apply();
 			MainActivity.updateRssFeedsSize();
 			new SavedFetchFeedTask(activity, mSwipeLayout).execute((Void) null);
@@ -141,7 +141,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 
 	public void SendJSON() {
 		Toast.makeText(activity, MainActivity.context.getString(R.string.sending_email), Toast.LENGTH_SHORT).show();
-		new SendEmailAsyncTask(SavedArticlesActivity.this, "From VGN: bookmarks", RssFeedsToJSON()).execute();
+		new SendEmailAsyncTask(SavedArticlesActivity.this, "[Easy News] " + getResources().getString(R.string.bookmarks), RssFeedsToJSON()).execute();
 	}
 
 	private class SavedFetchFeedTask extends FetchFeedTask {
@@ -157,7 +157,7 @@ public class SavedArticlesActivity extends AppCompatActivity {
 
 		@Override
 		protected Boolean doInBackground(Void... voids) {
-			rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+			rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null));
 			return rssFeeds.size() != 0;
 		}
 

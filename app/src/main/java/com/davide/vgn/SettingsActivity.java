@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -23,14 +24,35 @@ public class SettingsActivity extends AppCompatActivity {
 		activity = this;
 
 		final TextInputEditText urlsInput = (TextInputEditText) findViewById(R.id.urlsInput);
-		urlsInput.setText(MainActivity.sp.getString("urls", ""));
+		urlsInput.setText(MainActivity.sp.getString(Strings.urls, ""));
+		final TextInputEditText urlsInputJS = (TextInputEditText) findViewById(R.id.urlsInputJS);
+		urlsInputJS.setText(MainActivity.sp.getString(Strings.urlsJS, ""));
 
-		Button confirm = (Button) findViewById(R.id.confirm);
-		confirm.setOnClickListener(new View.OnClickListener() {
+		final EditText emailFrom = (EditText) findViewById(R.id.emailFrom);
+		emailFrom.setText(MainActivity.sp.getString(Strings.emailFrom, ""));
+		final EditText emailTo = (EditText) findViewById(R.id.emailTo);
+		emailTo.setText(MainActivity.sp.getString(Strings.emailTo, ""));
+
+		Button saveFeeds = (Button) findViewById(R.id.feedsSave);
+		saveFeeds.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				SharedPreferences.Editor editor = MainActivity.sp.edit();
-				editor.putString("urls", urlsInput.getText().toString());
+				editor.putString(Strings.urls, urlsInput.getText().toString());
+				editor.putString(Strings.urlsJS, urlsInputJS.getText().toString());
+				editor.apply();
+				Toast.makeText(activity, MainActivity.context.getString(R.string.done), Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		Button saveEmail = (Button) findViewById(R.id.emailSave);
+		saveEmail.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				SharedPreferences.Editor editor = MainActivity.sp.edit();
+				editor.putString(Strings.emailFrom, emailFrom.getText().toString());
+				editor.putString(Strings.emailPassword, ((EditText) findViewById(R.id.emailPassword)).getText().toString());
+				editor.putString(Strings.emailTo, emailTo.getText().toString());
 				editor.apply();
 				Toast.makeText(activity, MainActivity.context.getString(R.string.done), Toast.LENGTH_SHORT).show();
 			}

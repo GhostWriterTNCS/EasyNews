@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
 	compileSdkVersion 27
 	buildToolsVersion '28.0.3'
-	project.archivesBaseName = "VGN"
+	project.archivesBaseName = "Easy News"
 	defaultConfig {
 		applicationId "com.davide.vgn"
 		minSdkVersion 21

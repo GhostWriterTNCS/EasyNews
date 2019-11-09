@@ -46,7 +46,8 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected void onPreExecute() {
 		mSwipeLayout.setRefreshing(true);
-		feeds = MainActivity.sp.getString("urls", "").split("\n");
+		String urls = MainActivity.sp.getString(Strings.urls, "") + "\n" + MainActivity.sp.getString(Strings.urlsJS, "");
+		feeds = urls.split("\n");
 	}
 
 	@Override
@@ -83,19 +84,19 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			return false;
 		}
 
-		if (MainActivity.sp.getString("previous_timestamp", null) != null) {
+		if (MainActivity.sp.getString(Strings.previousTimestamp, null) != null) {
 			try {
-				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp", null));
+				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString(Strings.previousTimestamp, null));
 				DateFormat format = new SimpleDateFormat("HH:mm");
 				rssFeeds.add(new RssFeed(null, "Timestamp " + format.format(previous), timestampLink, null, previous, null));
 			} catch (Exception ex) {
 
 			}
 		}
-		if (MainActivity.sp.getString("previous_timestamp_backup", null) != null) {
+		if (MainActivity.sp.getString(Strings.previousTimestampBackup, null) != null) {
 			try {
-				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString("previous_timestamp_backup", null));
-				rssFeeds.add(new RssFeed(null, "Previous timestamp (backup)", timestampLink, null, previous, null));
+				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString(Strings.previousTimestampBackup, null));
+				rssFeeds.add(new RssFeed(null, "Timestamp (backup)", timestampLink, null, previous, null));
 			} catch (Exception ex) {
 
 			}
@@ -123,7 +124,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				previousLogLength = index;
 				break;
 			}
-			lastNews.add(rssFeeds.get(index).title + "@" + rssFeeds.get(index).channelTitle);
+			lastNews.add(rssFeeds.get(index).link);
 		}
 
 		for (int index = 0; index < previousLogLength; index++) {
@@ -131,10 +132,10 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				break;
 			}
 			//newFeedsCount = 0;
-			String prevLastNews = MainActivity.sp.getString("previous_" + index, null);
+			String prevLastNews = MainActivity.sp.getString(Strings.previous_ + index, null);
 			if (prevLastNews != null) {
 				for (int i = 0; i < rssFeeds.size(); i++) {
-					String s = rssFeeds.get(i).title + "@" + rssFeeds.get(i).channelTitle;
+					String s = rssFeeds.get(i).link;
 					if (s.equals(prevLastNews)) {
 						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news), null, null, null, null));
 						previousDate = rssFeeds.get(i).pubDate;
@@ -151,11 +152,11 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			if (previousBackupFound) {
 				break;
 			}
-			String prevLastNews = MainActivity.sp.getString("previous_backup_" + index, null);
+			String prevLastNews = MainActivity.sp.getString(Strings.previousBackup_ + index, "");
 			if (prevLastNews != null) {
 				for (int i = 0; i < rssFeeds.size(); i++) {
-					String s = rssFeeds.get(i).title + "@" + rssFeeds.get(i).channelTitle;
-					if (s.equals(prevLastNews)) {
+					String s = rssFeeds.get(i).link;
+					if (s != null && s.equals(prevLastNews)) {
 						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news_backup), null, null, null, null));
 						previousDate = rssFeeds.get(i).pubDate;
 						previousBackupFound = true;
@@ -174,22 +175,22 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 							Toast.LENGTH_LONG).show();
 				}
 			});
-			newFeedsCount = 0;
+			//newFeedsCount = 0;
 		}
 
 		SharedPreferences.Editor editor = MainActivity.sp.edit();
 		for (int index = 0; index < previousLogLength; index++) {
-			if (MainActivity.sp.getString("previous_" + index, null) != null) {
-				editor.putString("previous_backup_" + index, MainActivity.sp.getString("previous_" + index, null));
+			if (MainActivity.sp.getString(Strings.previous_ + index, null) != null) {
+				editor.putString(Strings.previousBackup_ + index, MainActivity.sp.getString(Strings.previous_ + index, null));
 			}
 		}
 		for (int index = 0; index < lastNews.size(); index++) {
-			editor.putString("previous_" + index, lastNews.get(index));
+			editor.putString(Strings.previous_ + index, lastNews.get(index));
 		}
-		if (MainActivity.sp.getString("previous_timestamp", null) != null) {
-			editor.putString("previous_timestamp_backup", MainActivity.sp.getString("previous_timestamp", null));
+		if (MainActivity.sp.getString(Strings.previousTimestamp, null) != null) {
+			editor.putString(Strings.previousTimestampBackup, MainActivity.sp.getString(Strings.previousTimestamp, null));
 		}
-		editor.putString("previous_timestamp", RssFeedManager.formatter.format(new Date()));
+		editor.putString(Strings.previousTimestamp, RssFeedManager.formatter.format(new Date()));
 		editor.apply();
 		return true;
 	}
@@ -200,9 +201,9 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		mSwipeLayout.setRefreshing(false);
 	}
 
-	protected void onPostExecute(Boolean success, final boolean bookmars) {
+	protected void onPostExecute(Boolean success, final boolean bookmarks) {
 		Set<String> viewedArticles = new HashSet<>();
-		viewedArticles.addAll(MainActivity.sp.getStringSet("viewed", new HashSet<String>()));
+		viewedArticles.addAll(MainActivity.sp.getStringSet(Strings.viewed, new HashSet<String>()));
 
 		LinearLayout linearLayout = (LinearLayout) ((Activity) activity).findViewById(R.id.verticalLayout);
 		linearLayout.removeAllViewsInLayout();
@@ -220,21 +221,18 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				child.findViewById(R.id.titleGroup).setVisibility(View.GONE);
 				child.findViewById(R.id.subtitleText).setVisibility(View.GONE);
 				child.findViewById(R.id.descriptionText).setVisibility(View.GONE);
-				i = 0;
+				//i = 0;
 			} else {
 				child.findViewById(R.id.verticalLayout).setOnLongClickListener(new View.OnLongClickListener() {
 					@Override
 					public boolean onLongClick(View view) {
-						ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null));
+						ArrayList<RssFeed> rssFeeds = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null));
 						if (!rssFeeds.contains(rssFeed)) {
 							rssFeeds.add(rssFeed);
 							Toast.makeText(MainActivity.context, "[+] " + rssFeed.title, Toast.LENGTH_SHORT).show();
-						/*} else {
-							rssFeeds.remove(rssFeed);
-							Toast.makeText(MainActivity.context, "[-] " + rssFeed.title, Toast.LENGTH_SHORT).show();*/
 						}
 						SharedPreferences.Editor editor = MainActivity.sp.edit();
-						editor.putString("saved_news", RssFeedManager.SerializeList(rssFeeds));
+						editor.putString(Strings.savedNews, RssFeedManager.SerializeList(rssFeeds));
 						editor.apply();
 						MainActivity.updateRssFeedsSize();
 						return true;
@@ -244,7 +242,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 					@Override
 					public void onClick(View view) {
 						Intent intent;
-						if (bookmars) {
+						if (bookmarks) {
 							intent = new Intent(activity, SavedArticleViewActivity.class);
 						} else {
 							intent = new Intent(activity, ArticleViewActivity.class);
@@ -272,7 +270,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				}
 				DateFormat myFormatter = new SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault());
 				String count = "";
-				if (newFeedsCount > 0 && i > 0) {
+				if (newFeedsCount > 0 && i <= newFeedsCount) {
 					count = i + "/" + newFeedsCount + " ";
 					i++;
 				}

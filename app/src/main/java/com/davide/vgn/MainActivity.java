@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
 	public static Context context;
 	public static SharedPreferences sp;
-	public static int attempts = 3;
+	public static int attempts = 2;
 
 	public static AppCompatActivity activity;
 	private SwipeRefreshLayout mSwipeLayout;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 		isWriteStoragePermissionGranted();
 
 		if (!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler)) {
-			Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler("VGN/log"));
+			Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler("Easy News/log"));
 		}
 
 		mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 		getMenuInflater().inflate(R.menu.main_menu, menu);
 		final View menu_hotlist = menu.findItem(R.id.bookmarks).getActionView();
 		bookmarksCount = (TextView) menu_hotlist.findViewById(R.id.text);
-		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null)).size();
+		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null)).size();
 		bookmarksCount.setText(Integer.toString(rssFeedsSize));
 		menu.findItem(R.id.bookmarks).getActionView().setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public static void updateRssFeedsSize() {
-		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString("saved_news", null)).size();
+		int rssFeedsSize = RssFeedManager.DeserializeList(MainActivity.sp.getString(Strings.savedNews, null)).size();
 		bookmarksCount.setText(Integer.toString(rssFeedsSize));
 	}
 }
