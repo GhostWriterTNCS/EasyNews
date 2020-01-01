@@ -24,7 +24,7 @@ import java.util.Locale;
 public final class RssFeedManager {
 	public static final DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
 
-	public static List<RssFeed> parseFeed(InputStream inputStream) throws Exception {
+	public static List<RssFeed> parseFeed(InputStream inputStream, boolean allowJS) throws Exception {
 		List<RssFeed> items = new ArrayList<>();
 		String channelTitle = null;
 		String title = null;
@@ -57,7 +57,7 @@ public final class RssFeedManager {
 						if (link.contains("://multiplayer.it/") && image != null) {
 							image = image.replace("_100x55_crop_", "_800x0_crop_");
 						}
-						items.add(new RssFeed(channelTitle, title, link, description, pubDate, image));
+						items.add(new RssFeed(channelTitle, title, link, description, pubDate, image, allowJS));
 						title = null;
 						link = null;
 						description = null;

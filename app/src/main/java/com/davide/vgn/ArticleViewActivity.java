@@ -45,15 +45,10 @@ public class ArticleViewActivity extends AppCompatActivity {
 		Intent intent = getIntent();
 		rssFeed = RssFeedManager.Deserialize(intent.getStringExtra(MainActivity.EXTRA_RSS_FEED));
 		url = rssFeed.link;
-		/*if (urls.startsWith("https://it.ign.com/") && !urls.startsWith("https://it.ign.com/m/")) {
-			urls = urls.replace("https://it.ign.com/", "https://it.ign.com/m/");
-		}*/
 		Log.d(MainActivity.TAG, url);
 
 		mWebView = ((WebView) findViewById(R.id.webView));
-		String domain = url.substring(url.indexOf("//") + 2);
-		domain = domain.substring(0, domain.indexOf("/"));
-		if (MainActivity.sp.getString(Strings.urlsJS, "").contains("://" + domain + "/")) {
+		if (rssFeed.allowJS) {
 			mWebView.getSettings().setJavaScriptEnabled(true);
 		}
 		mWebView.setWebViewClient(new WebViewClient() {

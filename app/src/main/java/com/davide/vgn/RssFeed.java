@@ -13,14 +13,16 @@ public class RssFeed implements Serializable {
 	public String description;
 	public Date pubDate;
 	public String image;
+	public boolean allowJS;
 
-	public RssFeed(String channelTitle, String title, String link, String description, Date pubDate, String image) {
+	public RssFeed(String channelTitle, String title, String link, String description, Date pubDate, String image, boolean allowJS) {
 		this.channelTitle = channelTitle;
 		this.title = StringUtils.unescapeHtml3(title);
 		this.pubDate = pubDate;
 		this.link = link;
 		this.description = StringUtils.unescapeHtml3(description);
 		this.image = image;
+		this.allowJS = allowJS;
 	}
 
 	@Override

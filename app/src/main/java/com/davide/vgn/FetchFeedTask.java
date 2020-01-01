@@ -31,6 +31,7 @@ import java.util.Set;
 
 public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	private String[] feeds;
+	private String[] feedsJS;
 	protected ArrayList<RssFeed> rssFeeds = new ArrayList<>();
 	protected AppCompatActivity activity;
 	protected SwipeRefreshLayout mSwipeLayout;
@@ -46,38 +47,21 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected void onPreExecute() {
 		mSwipeLayout.setRefreshing(true);
-		String urls = MainActivity.sp.getString(Strings.urls, "") + "\n" + MainActivity.sp.getString(Strings.urlsJS, "");
-		feeds = urls.split("\n");
+		//String urls = MainActivity.sp.getString(Strings.urls, "") + "\n" + MainActivity.sp.getString(Strings.urlsJS, "");
+		feeds = MainActivity.sp.getString(Strings.urls, "").split("\n");
+		feedsJS = MainActivity.sp.getString(Strings.urlsJS, "").split("\n");
 	}
 
 	@Override
 	protected Boolean doInBackground(Void... voids) {
 		for (String urlLink : feeds) {
-			if (urlLink.isEmpty() || urlLink.startsWith("#")) {
-				continue;
+			if (!ParseUrl(urlLink, false)) {
+				return false;
 			}
-			try {
-				if (!urlLink.startsWith("http://") && !urlLink.startsWith("https://")) {
-					urlLink = "http://" + urlLink;
-				}
-				URL url = new URL(urlLink);
-				InputStream inputStream = url.openConnection().getInputStream();
-				Log.d(MainActivity.TAG, urlLink);
-				rssFeeds.addAll(RssFeedManager.parseFeed(inputStream));
-				inputStream.close();
-			} catch (Exception e) {
-				Log.e(MainActivity.TAG, "Error", e);
-				final String s = urlLink;
-				activity.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						Toast.makeText(activity, s + " failed", Toast.LENGTH_LONG).show();
-					}
-				});
-				if (MainActivity.attempts > 0) {
-					MainActivity.attempts--;
-					return false;
-				}
+		}
+		for (String urlLink : feedsJS) {
+			if (!ParseUrl(urlLink, true)) {
+				return false;
 			}
 		}
 		if (rssFeeds.size() == 0) {
@@ -88,7 +72,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 			try {
 				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString(Strings.previousTimestamp, null));
 				DateFormat format = new SimpleDateFormat("HH:mm");
-				rssFeeds.add(new RssFeed(null, "Timestamp " + format.format(previous), timestampLink, null, previous, null));
+				rssFeeds.add(new RssFeed(null, "Timestamp " + format.format(previous), timestampLink, null, previous, null, false));
 			} catch (Exception ex) {
 
 			}
@@ -96,7 +80,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		if (MainActivity.sp.getString(Strings.previousTimestampBackup, null) != null) {
 			try {
 				Date previous = RssFeedManager.formatter.parse(MainActivity.sp.getString(Strings.previousTimestampBackup, null));
-				rssFeeds.add(new RssFeed(null, "Timestamp (backup)", timestampLink, null, previous, null));
+				rssFeeds.add(new RssFeed(null, "Timestamp (backup)", timestampLink, null, previous, null, false));
 			} catch (Exception ex) {
 
 			}
@@ -137,7 +121,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				for (int i = 0; i < rssFeeds.size(); i++) {
 					String s = rssFeeds.get(i).link;
 					if (s.equals(prevLastNews)) {
-						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news), null, null, null, null));
+						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news), null, null, null, null, false));
 						previousDate = rssFeeds.get(i).pubDate;
 						previousFound = true;
 						break;
@@ -157,7 +141,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 				for (int i = 0; i < rssFeeds.size(); i++) {
 					String s = rssFeeds.get(i).link;
 					if (s != null && s.equals(prevLastNews)) {
-						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news_backup), null, null, null, null));
+						rssFeeds.add(i, new RssFeed(null, MainActivity.context.getString(R.string.old_news_backup), null, null, null, null, false));
 						previousDate = rssFeeds.get(i).pubDate;
 						previousBackupFound = true;
 						break;
@@ -195,6 +179,37 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		return true;
 	}
 
+	boolean ParseUrl(String urlLink, boolean allowJS) {
+		if (urlLink.isEmpty() || urlLink.startsWith("#")) {
+			return true;
+		}
+		try {
+			if (!urlLink.startsWith("http://") && !urlLink.startsWith("https://")) {
+				urlLink = "http://" + urlLink;
+			}
+			URL url = new URL(urlLink);
+			InputStream inputStream = url.openConnection().getInputStream();
+			Log.d(MainActivity.TAG, urlLink);
+			rssFeeds.addAll(RssFeedManager.parseFeed(inputStream, allowJS));
+			inputStream.close();
+		} catch (Exception e) {
+			Log.e(MainActivity.TAG, "Error", e);
+			final String s = urlLink;
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Toast.makeText(activity, s + " failed", Toast.LENGTH_LONG).show();
+				}
+			});
+			if (MainActivity.attempts > 0) {
+				MainActivity.attempts--;
+				return false;
+			}
+		}
+		return true;
+	}
+
+
 	@Override
 	protected void onPostExecute(Boolean success) {
 		onPostExecute(success, false);
@@ -209,7 +224,7 @@ public class FetchFeedTask extends AsyncTask<Void, Void, Boolean> {
 		linearLayout.removeAllViewsInLayout();
 		if (!success) {
 			rssFeeds.clear();
-			rssFeeds.add(new RssFeed(null, MainActivity.context.getString(R.string.no_news), null, null, null, null));
+			rssFeeds.add(new RssFeed(null, MainActivity.context.getString(R.string.no_news), null, null, null, null, false));
 		}
 
 		int i = 1;

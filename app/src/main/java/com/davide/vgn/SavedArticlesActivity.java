@@ -122,7 +122,8 @@ public class SavedArticlesActivity extends AppCompatActivity {
 						j.getString("link"),
 						j.getString("description"),
 						RssFeedManager.formatter.parse(j.getString("pubDate")),
-						j.has("image") ? j.getString("image") : null
+						j.has("image") ? j.getString("image") : null,
+						j.getBoolean("allowJS")
 				));
 			}
 			SharedPreferences.Editor editor = MainActivity.sp.edit();
